@@ -1,0 +1,5 @@
+{
+  id = \x.x
+  a = (id \y.y)
+  b = (id \z.z)
+} (a b)

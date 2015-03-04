@@ -1,0 +1,15 @@
+{
+  Y = \g.(\x.[g x x] \x.[g x x])
+  cons = \h.\t.\p.(p h t)
+  iszero = \m.(m \g.\t.\f.t \t.\f.t)
+  zero = \f.\x.x
+  one = \f.\x.(f x)
+  ten = \f.\x.[f f f f f f f f f f x]
+  zeros = (Y \zeros.(cons zero zeros))
+  ones = (Y \ones.(cons one ones))
+  pair = \f.\s.\g.(g f s)
+  zip = (Y \zip.\xs.\ys.(xs \x.\xt.(ys \y.\yt.(cons (pair x y) (zip xt yt)))))
+  tail = (\l.(l \h.\t.t))
+  head = (\l.(l \h.\t.h))
+}
+(ten tail (zip ones zeros) \h.\t.(h \one.\zero.one))

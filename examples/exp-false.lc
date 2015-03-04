@@ -1,0 +1,6 @@
+(\iszero.
+  (\n.
+    (iszero (n n))
+  \f.\z.(f (f (f (f (f (f z)))))))
+\m.((m \g.\t.\f.t) \t.\f.t))
+

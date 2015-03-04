@@ -1,0 +1,15 @@
+(\true.
+(\false.
+(\const.
+(\pair.
+(\f.
+(\arg.
+(\res.
+(res \x.x)
+(f ((pair true) arg)))
+(f ((pair false) (const false))))
+\p.(p \b.\k.((b k) (const b))))
+\f.\s.\p.((p f) s))
+true)
+\t.\f.f)
+\t.\f.t)

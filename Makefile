@@ -2,7 +2,7 @@
 all: cfa
 
 cfa: *.hs
-	ghc -O3 Main.hs -o pdcfa
+	cabal install
 
 clean:
 	rm *.o cfa *.hi

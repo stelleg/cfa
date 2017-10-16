@@ -7,6 +7,7 @@ import Data.Maybe
 import Prelude hiding (map, exp, pred)
 import Text.Parsec.Pos (newPos, sourceLine, sourceColumn)
 import Debug.Trace
+import Data.GraphViz.Printing (PrintDot (..), unqtText)
 import Data.GraphViz.Types.Monadic
 import Data.GraphViz.Attributes.Complete hiding (Lt, label, Label, EdgeType)
 import Data.GraphViz.Attributes 
@@ -158,11 +159,6 @@ clo exp env = Clo exp $ filter (\(v, c) -> v `member` fvs exp) env
 match :: Clo -> Clo -> Bool
 match (Clo exp env) (Clo exp' env') = exp == exp' && all id (zipWith match (fmap snd env) (fmap snd env'))
 
-fvs :: Expr -> Set Var
-fvs (Var l v) = singleton v
-fvs (App l m n) = fvs m `union` fvs n
-fvs (Lam l v b) = fvs b `difference` singleton v
-
 cn :: Conf -> Node
 cn (c,s,b) = (c,b)
 
@@ -171,11 +167,14 @@ cn (c,s,b) = (c,b)
 instance Show Clo where
   show (Clo exp env) = "<" ++ show exp ++ ", " ++ show env ++ ">"
 
+instance PrintDot Clo where
+  unqtDot = unqtText . pack . show
+  
 plotDSG es = showGraph "cfa.dot" dot where 
   dot = digraph (Str "CFA") $ do
     graphAttrs [textLabel "CFA"]
-    sequence [node (ind$loc$exp c) [textLabel (pack$take 20$show$c)] | (c',t,c) <- elems es]
-    sequence [edge (ind$loc$exp c) (ind$loc$exp c') [textLabel$pack$take 20$show t] | (c,t,c') <- elems es] 
+    sequence [node c [textLabel$pack$show$c] | (c',t,c) <- elems es]
+    sequence [edge c c' [textLabel$pack$show t] | (c,t,c') <- elems es] 
   showGraph fname dg = do
     runGraphviz dg DotOutput ("/tmp/" ++ fname)
     runGraphvizCanvas' dg Xlib

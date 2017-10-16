@@ -1,9 +1,12 @@
+{-# LANGUAGE FlexibleContexts #-}
+
 module Expr where
 import Control.Applicative hiding ((<|>), many)
 import Text.Parsec
 import Text.Parsec.Prim (getPosition)
 import Text.Parsec.Pos (SourcePos)
 import Text.Parsec.Token
+import qualified Data.Set as S
 
 type Loc = SourcePos
 type Var = String
@@ -33,10 +36,16 @@ pa ^> pb  = (pa >> spaces) *> pb
 pa <^ pb  = pa <* (spaces >> pb)
 infixl 4 <^>, <^, ^>
 
+fvs :: Expr -> S.Set Var
+fvs (Var l v) = S.singleton v
+fvs (App l m n) = fvs m `S.union` fvs n
+fvs (Lam l v b) = fvs b `S.difference` S.singleton v
+
+
 parseExpr = parse expr where
   expr :: Parsec String () Expr
   expr =  Lam <$> getPosition <*> ((lam *> var) <* char '.') <^> expr 
-      <|> App <$> getPosition <*> (char '(' ^> expr) <^> (expr <^ char ')') 
+      <|> App <$> getPosition <*> (char '(' ^> expr) <^> (expr <^ char ')')
       <|> Var <$> getPosition <*> var
       <|> char '{' ^> (lets <$> many (spaces *> binding <* spaces) <^> (char '}' ^> expr))
         where lets = flip $ foldr ($) 
